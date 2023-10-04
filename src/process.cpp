@@ -3,52 +3,51 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <iostream>
+
 #include "process.h"
+#include "linux_parser.h"
 
 using std::string;
 using std::to_string;
 using std::vector;
 
-// TODO: Return this process's ID
-int Process::Pid() { 
-  return pid;
- }
+Process::Process(int pid) {
+  pid_ = pid;
+  command_ = LinuxParser::Command(pid);
+  ram_ = LinuxParser::Ram(pid);
+  uptime_ = LinuxParser::UpTime(pid);
+  user_ = LinuxParser::User(pid);
 
-// TODO: Return this process's CPU utilization
-float Process::CpuUtilization() const { 
-  long total_time = LinuxParser::ActiveJiffies(pid);
-  long start_time = LinuxParser::UpTime(pid);
-  long uptime = LinuxParser::UpTime();
-  long seconds = uptime - (start_time / sysconf(_SC_CLK_TCK));
+  long seconds = LinuxParser::UpTime() - uptime_;
+  long totaltime = LinuxParser::ActiveJiffies(pid);
+  try {
+    CPUulitizations_ = float(totaltime) / float(seconds);
 
-  float cpu_usage = (total_time / sysconf(_SC_CLK_TCK)) / (float)seconds;
-  return cpu_usage;
+  } catch (...) {
+    CPUulitizations_ = 0;
+  }
 }
 
+// TODO: Return this process's ID
+int Process::Pid() const { return pid_; }
+
+// TODO: Return this process's CPU utilization
+float Process::CpuUtilization() const { return CPUulitizations_; }
 
 // TODO: Return the command that generated this process
-string Process::Command() { 
-  return command;
- }
+string Process::Command() const { return command_; }
 
 // TODO: Return this process's memory utilization
-string Process::Ram() { 
-  return ram;
- }
+string Process::Ram() const { return ram_; }
 
 // TODO: Return the user (name) that generated this process
-string Process::User() { 
-  return user;
- }
+string Process::User() const { return user_; }
 
 // TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { 
-  return uptime;
- }
+long int Process::UpTime() const { return uptime_; }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a) const { 
+bool Process::operator<(Process const& a) const {
   return CpuUtilization() < a.CpuUtilization();
- }
+}
