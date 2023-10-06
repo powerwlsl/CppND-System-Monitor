@@ -1,54 +1,22 @@
-#include <thread>
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <sstream> 
-
 #include "processor.h"
+
+#include <unistd.h>
+
+#include <sstream>
+
 #include "linux_parser.h"
 
+using std::string;
+using std::vector;
+
 // TODO: Return the aggregate CPU utilization
-float Processor::Utilization() { 
-  std::vector<long> start = ParseCPUData();
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  std::vector<long> end = ParseCPUData();
+float Processor::Utilization() { return std::stof(LinuxParser::CpuUtilization()[0]); }
+vector<long> Processor::getCurrUtilization() {
+  vector<string> util = LinuxParser::CpuUtilization();
+  long userCurr, niceCurr, systemCurr, idleCurr, iowaitCurr, irqCurr,
+      softirqCurr, stealCurr, total, Idle, NonIdle;
 
-  if(start.empty() || end.empty()) {
-    return 0.0f;
-  }
-
-  long startIdle = start[LinuxParser::CPUStates::kIdle_] + start[LinuxParser::CPUStates::kIOwait_];
-  long endIdle = end[LinuxParser::CPUStates::kIdle_] + end[LinuxParser::CPUStates::kIOwait_];
-  long startTotal = 0;
-  long endTotal = 0;
-
-  for (long value : start) {
-    startTotal += value;
-  }
-
-  for (long value : end) {
-    endTotal += value;
-  }
-
-  float idleDifference = endIdle - startIdle;
-  float totalDifference = endTotal - startTotal;
-  return (totalDifference - idleDifference) / totalDifference;
- }
-
-
-std::vector<long> Processor::ParseCPUData() {
-  std::ifstream filestream(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
-  std::string line, cpu;
-  std::vector<long> values;
-
-  if (filestream.is_open() && std::getline(filestream, line)) {
-    std::istringstream linestream(line);
-    linestream >> cpu;
-    long value;
-    while (linestream >> value) {
-      values.push_back(value);
-    }
-  }
-  return values;  
-}
+  userCurr = std::stol(util[0]);
+  niceCurr = std::stol(util[1]);
+  systemCurr = std::stol(util[2]);
+  idleCurr = std::stol(util[3]);
