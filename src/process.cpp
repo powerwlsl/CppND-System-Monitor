@@ -1,48 +1,39 @@
+#include "process.h"
+
 #include <unistd.h>
+
 #include <cctype>
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "linux_parser.h"
-#include "process.h"
 
 using std::string;
 using std::to_string;
 using std::vector;
 
-Process::Process (int p) {
-  pId_ = p;
-}
+Process::Process(size_t pid) { _pid = pid; }
 
-// TODO: Return this process's ID
-int Process::Pid() const { return pid_; }
+int Process::Pid() { return _pid; }
 
-// TODO: Return this process's CPU utilization
 float Process::CpuUtilization() {
-    long sUpTime = LinuxParser::UpTime();
-    long pUpTime = LinuxParser::UpTime(pId_);
-    long totalTime = LinuxParser::ActiveJiffies(pId_);
+  // Calculate active time, uptime, and utilization
+  float activeTime = static_cast<float>(LinuxParser::ActiveJiffies(Pid())) / 100.0f;
+  float uptime = static_cast<float>(LinuxParser::UpTime(Pid()));
+  float utilization = activeTime / uptime;
 
-    float elapTime = float(sUpTime) - (float(pUpTime)/sysconf(_SC_CLK_TCK));
-    cpuUtil_ = 100*(float(totalTime)/sysconf(_SC_CLK_TCK))/elapTime;
-    return cpuUtil_;
+  return utilization;
 }
 
-// TODO: Return the command that generated this process
-string Process::Command() { return LinuxParser::Command(Pid()); }
+string Process::Command() { return LinuxParser::Command(_pid); }
 
-// TODO: Return this process's memory utilization
-string Process::Ram() { return LinuxParser::Ram(Pid()); }
+string Process::Ram() const { return LinuxParser::Ram(_pid); }
 
-// TODO: Return the user (name) that generated this process
-string Process::User() { return LinuxParser::User(Pid()); }
+string Process::User() { return LinuxParser::User(_pid); }
 
-// TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { return LinuxParser::UpTime(Pid()); }
+long int Process::UpTime() { return LinuxParser::UpTime(_pid); }
 
-// https://knowledge.udacity.com/questions/96882
-// TODO: Overload the "less than" comparison operator for Process objects
-// REMOVE: [[maybe_unused]] once you define the function
 bool Process::operator<(Process const& a) const {
-    return this->cpuUtil_ < a.cpuUtil_;
+  return std::stof(Process::Ram()) < std::stof(a.Ram());
 }

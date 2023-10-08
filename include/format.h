@@ -2,9 +2,8 @@
 #define FORMAT_H
 
 #include <string>
-
-namespace Format {
-std::string ElapsedTime(long times);  // TODO: See src/format.cpp
-};                                    // namespace Format
+// Removed the namespace because I was getting undefined references.
+// TODO(solo): Put back the namespace
+std::string ElapsedTime(long seconds);
 
 #endif
