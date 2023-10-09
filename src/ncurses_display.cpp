@@ -48,7 +48,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
       window, ++row, 2,
       ("Running Processes: " + to_string(system.RunningProcesses())).c_str());
   mvwprintw(window, ++row, 2,
-            ("Up Time: " + ElapsedTime(system.UpTime())).c_str());
+            ("Up Time: " + Format::ElapsedTime(system.UpTime())).c_str());
   wrefresh(window);
 }
 
@@ -80,7 +80,7 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
     mvwprintw(window, row, cpu_column, to_string(cpu).substr(0, 4).c_str());
     mvwprintw(window, row, ram_column, processes[i].Ram().c_str());
     mvwprintw(window, row, time_column,
-              ElapsedTime(processes[i].UpTime()).c_str());
+              Format::ElapsedTime(processes[i].UpTime()).c_str());
     mvwprintw(window, row, command_column,
               processes[i].Command().substr(0, window->_maxx - 46).c_str());
   }

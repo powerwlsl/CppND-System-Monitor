@@ -1,22 +1,11 @@
-#include "format.h"
-
-#include <iomanip>
-#include <sstream>
 #include <string>
 
-std::string ElapsedTime(long seconds) {
-  // Calculate hours, minutes, and remaining seconds
-  int hours = (seconds / 3600) % 100;
-  int minutes = (seconds % 3600) / 60;
-  int remaining_seconds = seconds % 60;
+#include "format.h"
 
-  // Create a stringstream to format the output
-  std::stringstream formatted_time;
+using std::string;
 
-  // Format the hours, minutes, and seconds with leading zeros
-  formatted_time << std::setfill('0') << std::setw(2) << hours << ":";
-  formatted_time << std::setfill('0') << std::setw(2) << minutes << ":";
-  formatted_time << std::setfill('0') << std::setw(2) << remaining_seconds;
-
-  return formatted_time.str();  // Convert the stringstream to a string
-}
+// TODO: Complete this helper function
+// INPUT: Long int measuring seconds
+// OUTPUT: HH:MM:SS
+// REMOVE: [[maybe_unused]] once you define the function
+string Format::ElapsedTime(long seconds[[maybe_unused]]) { return string(); }
