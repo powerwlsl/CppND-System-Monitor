@@ -1,6 +1,9 @@
 #ifndef FORMAT_H
 #define FORMAT_H
 
+#define SECONDS_IN_HOUR 3600
+#define SECONDS_IN_MINUTE 60
+#include <cmath>
 #include <string>
 
 namespace Format {
