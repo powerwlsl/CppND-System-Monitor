@@ -4,31 +4,19 @@
 
 using std::string;
 
-string Format::ElapsedTime(long seconds) {
-  string hh_string;
-  string mm_string;
-  string ss_string;
-  int HH = std::floor(seconds / SECONDS_IN_HOUR);
-  seconds = seconds % SECONDS_IN_HOUR;
-  int MM = std::floor(seconds / SECONDS_IN_MINUTE);
-  seconds = seconds % SECONDS_IN_MINUTE;
-  int SS = std::round(seconds);
-  if (HH < 10) {
-    hh_string = "0" + std::to_string(HH);
-  } else {
-    hh_string = std::to_string(HH);
-  }
-  if (MM < 10) {
-    mm_string = "0" + std::to_string(MM);
-  }
-  else {
-    mm_string = std::to_string(MM);
-  }
-  if (SS < 10) {
-    ss_string = "0" + std::to_string(SS);
-  } else {
-    ss_string = std::to_string(SS);
-  }
-  string output_string = hh_string + ":" + mm_string + ":" + ss_string;
-  return output_string;
-}
+// TODO: Complete this helper function
+// INPUT: Long int measuring seconds
+// OUTPUT: HH:MM:SS
+// REMOVE: [[maybe_unused]] once you define the function
+string Format::ElapsedTime(long seconds) { 
+    int hour, minute;
+    string result;
+    hour = seconds / 3600;
+    seconds = seconds % 3600;
+    minute = seconds / 60;
+    seconds = seconds % 60;
+    result = std::to_string(hour) + ":" + std::to_string(minute) + ":" + std::to_string(seconds);
+    
+    
+    return result; 
+    }

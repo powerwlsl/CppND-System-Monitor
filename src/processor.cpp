@@ -1,17 +1,27 @@
-#include <vector>
-#include <string>
-
 #include "processor.h"
 
-float Processor::Utilization() {
-  vector<string> jiffies = LinuxParser::CpuUtilization();
-  float Idle = std::stof(jiffies[CPUStates::kIdle_]) + std::stof(jiffies[CPUStates::kIOwait_]);
-  float NonIdle = std::stof(jiffies[CPUStates::kUser_]) + std::stof(jiffies[CPUStates::kNice_]) + std::stof(jiffies[CPUStates::kSystem_]) + std::stof(jiffies[CPUStates::kIRQ_]) + std::stof(jiffies[CPUStates::kSoftIRQ_]) + std::stof(jiffies[CPUStates::kSteal_]);
-  float Total = Idle + NonIdle;
-  float totald = Total - prevTotal;
-  float idled = Idle - prevIdle;
-  prevIdle = Idle;
-  prevNonIdle = NonIdle;
-  prevTotal = Total;
-  return (totald - idled) / totald;
+// TODO: Return the aggregate CPU utilization
+float Processor::Utilization() { 
+    // Return the aggregate CPU utilization
+  long total_old, total_new, active_new, idle_old, idle_new;
+  total_new = LinuxParser::Jiffies();
+  active_new = LinuxParser::ActiveJiffies();
+  idle_new = LinuxParser::IdleJiffies();
+
+  total_old = m_total;
+  idle_old = m_idle;
+
+  UpdateStats(idle_new, active_new, total_new);
+
+  float totalDelta = float(total_new) - float(total_old);
+  float idleDetla = float(idle_new) - float(idle_old);
+
+  float utilization = (totalDelta - idleDetla) / totalDelta;
+  return utilization;
+}
+
+void Processor::UpdateStats(long idle, long active, long total) {
+  m_idle = idle;
+  m_active = active;
+  m_total = total;
 }
