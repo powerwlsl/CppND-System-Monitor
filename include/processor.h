@@ -1,25 +1,17 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
-#include "linux_parser.h"
+#include <linux_parser.h>
 
-// class Processor {
-//  public:
-//   float Utilization();  // TODO: See src/processor.cpp
-
-//   // TODO: Declare any necessary private members
-//  private:
-// };
 class Processor {
- public:
-  float Utilization();
+    public:
+        Processor();
+        float Utilization(); 
 
-  void UpdateStats(long idle, long active, long total);
-
- private:
-  long m_idle;
-  long m_active;
-  long m_total;
+    // Store current stats for short-term evaluation of CPU utilization.
+    private:
+        long last_jiffies_;
+        long last_active_jiffies_;
 };
 
 #endif

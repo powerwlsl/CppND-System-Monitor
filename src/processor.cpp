@@ -1,27 +1,17 @@
 #include "processor.h"
+#include "linux_parser.h"
 
-// TODO: Return the aggregate CPU utilization
-float Processor::Utilization() { 
-    // Return the aggregate CPU utilization
-  long total_old, total_new, active_new, idle_old, idle_new;
-  total_new = LinuxParser::Jiffies();
-  active_new = LinuxParser::ActiveJiffies();
-  idle_new = LinuxParser::IdleJiffies();
-
-  total_old = m_total;
-  idle_old = m_idle;
-
-  UpdateStats(idle_new, active_new, total_new);
-
-  float totalDelta = float(total_new) - float(total_old);
-  float idleDetla = float(idle_new) - float(idle_old);
-
-  float utilization = (totalDelta - idleDetla) / totalDelta;
-  return utilization;
+Processor::Processor() {
+    last_jiffies_ = LinuxParser::Jiffies();
+    last_active_jiffies_ = LinuxParser::ActiveJiffies();
 }
 
-void Processor::UpdateStats(long idle, long active, long total) {
-  m_idle = idle;
-  m_active = active;
-  m_total = total;
+// Aggregate CPU utilization. Formula given in https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
+float Processor::Utilization() { 
+    long jiffies = LinuxParser::Jiffies();
+    long active_jiffies = LinuxParser::ActiveJiffies();
+    float util = (float)(active_jiffies - last_active_jiffies_) / (jiffies - last_jiffies_);
+    last_active_jiffies_ = active_jiffies;
+    last_jiffies_ = jiffies;
+    return util;
 }
