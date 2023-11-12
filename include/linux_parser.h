@@ -7,7 +7,7 @@
 
 namespace LinuxParser {
 // Paths
-const std::string kProcDirectory{"/proc"};
+const std::string kProcDirectory{"/proc/"};
 const std::string kCmdlineFilename{"/cmdline"};
 const std::string kCpuinfoFilename{"/cpuinfo"};
 const std::string kStatusFilename{"/status"};
@@ -29,23 +29,18 @@ std::string Kernel();
 
 // CPU
 enum CPUStates {
-  kUser_ = 1,
-  kNice_ = 2,
-  kSystem_ = 4,
-  kIdle_ = 8,
-  kIOwait_ = 16,
-  kIRQ_ = 32,
-  kSoftIRQ_ = 64,
-  kSteal_ = 128,
-  kGuest_ = 256,
-  kGuestNice_ = 512
+  kUser_ = 0,
+  kNice_,
+  kSystem_,
+  kIdle_,
+  kIOwait_,
+  kIRQ_,
+  kSoftIRQ_,
+  kSteal_,
+  kGuest_,
+  kGuestNice_
 };
-const CPUStates kAllStates[] = {kUser_, kNice_, kSystem_, kIdle_, kIOwait_, kIRQ_, kSoftIRQ_, kSteal_, kGuest_, kGuestNice_};
-const int kAllIdle = kIdle_ | kIOwait_;
-const int kAllActive = kUser_ | kNice_ | kSystem_ | kIRQ_ | kSoftIRQ_ | kSteal_;
-const int kAllJiffies = 255;
-std::map<CPUStates, long> CpuUtilization();
-long SystemJiffiesFiltered(const int filter);
+std::vector<std::string> CpuUtilization();
 long Jiffies();
 long ActiveJiffies();
 long ActiveJiffies(int pid);

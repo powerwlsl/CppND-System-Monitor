@@ -1,25 +1,30 @@
 #include <string>
-#include <sstream>
-#include <iostream>
 
 #include "format.h"
 
 using std::string;
 
-// Adds a "0" for nice alignment
-string Format::AddZeroIfNeeded(long number) {
-    return number < 10 ? "0" + std::to_string(number) : std::to_string(number);
+// TODO: Complete this helper function
+// INPUT: Long int measuring seconds
+// OUTPUT: HH:MM:SS
+// REMOVE: [[maybe_unused]] once you define the function
+//string Format::ElapsedTime(long seconds[[maybe_unused]]) { return string(); }
+string TwoSigFig(long time){
+    string twoSigFig;
+    if(time<10){twoSigFig+="0";}
+    twoSigFig+=std::to_string(time);
+    return twoSigFig;
 }
 
-// Formats a given time in seconds into HH:MM:SS
-string Format::ElapsedTime(long seconds) { 
-    long hours, minutes;
-    hours = seconds / 3600;
-    seconds %= 3600;
-    minutes = seconds / 60;
-    seconds %= 60;
-
-    std::ostringstream stream;
-    stream << AddZeroIfNeeded(hours) << ":" << AddZeroIfNeeded(minutes) << ":" << AddZeroIfNeeded(seconds);
-    return stream.str();     
-}
+string Format::ElapsedTime(long int seconds) { 
+    string HHMMSS;
+    long int S = seconds%60;
+    long int M = (seconds-S)/60;
+    long int H = (M-(M%60))/60;
+    M-= H*60;
+    string SS = TwoSigFig(S);
+    string MM = TwoSigFig(M);
+    string HH = TwoSigFig(H);
+    HHMMSS += HH + ":" + MM + ":" + SS;
+    return HHMMSS;
+    }
