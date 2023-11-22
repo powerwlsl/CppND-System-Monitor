@@ -1,16 +1,15 @@
 #ifndef PROCESS_H
 #define PROCESS_H
-#include "linux_parser.h"
+
 #include <string>
-#include <vector>
-
-
+#include "linux_parser.h"
 /*
 Basic class for Process representation
 It contains relevant attributes as shown below
 */
 class Process {
  public:
+  Process(int proc);
   int Pid();                               // TODO: See src/process.cpp
   std::string User();                      // TODO: See src/process.cpp
   std::string Command();                   // TODO: See src/process.cpp
@@ -18,23 +17,15 @@ class Process {
   std::string Ram();                       // TODO: See src/process.cpp
   long int UpTime();                       // TODO: See src/process.cpp
   bool operator<(Process const& a) const;  // TODO: See src/process.cpp
-  Process(int pid) : _pid(pid){
-    //Pid();
-    User();
-    CpuUtilization();
-    Ram();
-    UpTime();
-    Command();
-  };
-  // std::vector<int> _pids;
-  // int _pid;
 
   // TODO: Declare any necessary private members
  private:
-  //long int uptime_;
-  //int _uptime;
-  int _pid;
-  //std::vector<int> _pids;
+ int pid;
+ std::string user;
+ std::string command;
+ std::string ram;
+ float cpu_utilization;
+ long uptime;
 };
 
 #endif
