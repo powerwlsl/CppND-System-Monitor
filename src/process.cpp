@@ -1,60 +1,50 @@
+#include "process.h"
+
 #include <unistd.h>
+
 #include <cctype>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include "process.h"
 #include "linux_parser.h"
 
 using std::string;
 using std::to_string;
 using std::vector;
 
-Process::Process(int proc){
-    pid = proc;
-    user = LinuxParser::User(proc);
-    ram = LinuxParser::Ram(proc);
-    command = LinuxParser::Command(proc);
-    cpu_utilization = CpuUtilization();
-    uptime = LinuxParser::UpTime(proc);
+// Return this process's ID
+int Process::Pid() { return pid_; }
+
+// Return this process's CPU utilization
+float Process::CpuUtilization() const {
+  float active_time = LinuxParser::ActiveJiffies(pid_) / sysconf(_SC_CLK_TCK);
+  float seconds = Process::UpTime();
+  return active_time / seconds;
 }
 
-// TODO: Return this process's ID 
-int Process::Pid() { return pid; }
+// Return the command that generated this process
+string Process::Command() { return LinuxParser::Command(pid_); }
 
-// TODO: Return this process's CPU utilization
-float Process::CpuUtilization() {
-    string line;
-    string pid_, comm, state, ppid, pgrp, session, tt_nr, tpgid, flags, minflt, cminflt, majflt, cmajflt, priority, nice, num_threads, itrealvalue;
-    long utime, stime, cutime, cstime, starttime;
-    // source: https://man7.org/linux/man-pages/man5/proc.5.htmls
-    std::ifstream filestream(LinuxParser::kProcDirectory + std::to_string(pid) + LinuxParser::kStatFilename);
-    if (filestream.is_open()) {
-        std::getline(filestream, line);
-        std::istringstream linestream(line);
-        linestream >> pid_ >> comm >> state >> ppid >> pgrp >> session >> tt_nr >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt >> utime >> stime >> cutime >> cstime >> priority >> nice >> num_threads >> itrealvalue >> starttime;
-        long total_time = utime + stime + cutime + cstime;
-        float seconds = (float) LinuxParser::UpTime() - ( (float) starttime / sysconf(_SC_CLK_TCK));
-        cpu_utilization = 100 * ((total_time / sysconf(_SC_CLK_TCK)) / seconds);
-        return cpu_utilization;
-        // source: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-    }
-    return -1;
+// Return this process's memory utilization
+string Process::Ram() {
+  long ram_kB = stol(LinuxParser::Ram(pid_));
+  return to_string(ram_kB / 1024);
 }
 
-// TODO: Return the command that generated this process
-string Process::Command() { return command; }
+// Return the user (name) that generated this process
+string Process::User() { return LinuxParser::User(pid_); }
 
-// TODO: Return this process's memory utilization
-string Process::Ram() { return ram; }
+// Return the age of this process (in seconds)
+long int Process::UpTime() const {
+  return LinuxParser::UpTime() -
+         (LinuxParser::UpTime(pid_) / sysconf(_SC_CLK_TCK));
+}
 
-// TODO: Return the user (name) that generated this process
-string Process::User() { return user; }
+// Overload the "less than" comparison operator for Process objects
+bool Process::operator<(Process const& a) const {
+  return a.CpuUtilization() < this->CpuUtilization();
+}
 
-// TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { return uptime; }
-
-// TODO: Overload the "less than" comparison operator for Process objects
-// REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a) const { return (this->cpu_utilization < a.cpu_utilization); }
+// Setter method to set process PID
+void Process::setPid(int pid) { pid_ = pid; }
